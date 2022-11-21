@@ -35,6 +35,7 @@ def get_ch_pos(matrix):
     x, y = pos[0].tolist()[0], pos[1].tolist()[0]
     return x, y
 
+
 print('*************')
 
 
@@ -48,13 +49,27 @@ def get_elements(matrix, element):
             aux.append([itemx, itemy])
     return aux
 
+
 print('****')
 
-aux = get_elements(matrix, 'd')
-print(aux)
-# x, y = get_elements(s_start, 'd')
-# print(type(x), type(y))
-# print(x[0], y[0])
+diams = get_elements(matrix, 'd')
+keys = get_elements(matrix, 'k')
+rocks = get_elements(matrix, 'r')
+holes = get_elements(matrix, 'ho')
+doorRs = get_elements(matrix, 'dR')
+doorMs = get_elements(matrix, 'dM')
+doorMs = get_elements(matrix, 'dM')
+stairs = get_elements(matrix, 'sT')
+
+
+print(diams)
+print(keys)
+print(rocks)
+print(holes)
+print(doorRs)
+print(doorMs)
+print(stairs[0])
+
 print(get_ch_pos(matrix))
 
 
