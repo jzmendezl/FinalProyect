@@ -44,13 +44,38 @@ def get_elements(matrix, element):
     item = np.where(matrix == element)
     x, y = item[0].tolist(), item[1].tolist()
 
-    for itemx in x:
-        for itemy in y:
-            aux.append([itemx, itemy])
+    for itemx, itemy in zip(x, y):
+        aux.append([itemx, itemy])
     return aux
 
 
+def get_movements(matrix):
+    wall1 = np.where(matrix == 'w1')
+    wall2 = np.where(matrix == 'w2')
+    NF = np.where(matrix == 'NF')
+
+    mov = len(wall1[0]) + len(wall2[0]) + len(NF[0])
+    return 150 - mov
+
+
 print('****')
+
+def euclidian_dist(pos_ch, elem_list):
+    dist = []
+    for i in elem_list:
+        dist.append(np.sqrt(np.sum(np.square(np.array(pos_ch) - np.array(i)))))
+    return dist
+
+def node_swap(node, pos_x, pos_y, operX, operY):
+    node[pos_x][pos_y] = node[pos_x + operX][pos_y + operY]
+    node[pos_x + operX][pos_y + operY] = 0
+    return node
+
+
+
+
+# aux = get_elements(matrix, 'd')
+# print(aux)
 
 diams = get_elements(matrix, 'd')
 keys = get_elements(matrix, 'k')
@@ -61,7 +86,6 @@ doorMs = get_elements(matrix, 'dM')
 doorMs = get_elements(matrix, 'dM')
 stairs = get_elements(matrix, 'sT')
 
-
 print(diams)
 print(keys)
 print(rocks)
@@ -71,8 +95,10 @@ print(doorMs)
 print(stairs[0])
 
 print(get_ch_pos(matrix))
+print(get_movements(matrix))
 
-
+dist = euclidian_dist(get_ch_pos(matrix), diams)
+print(dist)
 
 # fn.press_and_release('right', pressed=5)
 # fn.press_and_release('down', pressed=3)
