@@ -85,72 +85,71 @@ def getPath(Matrix, currentPosition, objetivos, distancias, LIM_MOV):
 
 def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
 
-    row = currentPosition[0]
-    col = currentPosition[1]
-
-    print(Result)
+    row = copy.deepcopy(currentPosition[0])
+    col = copy.deepcopy(currentPosition[1])
     if Matrix[row][col] == "sT" and (len(objetivos) == 0):
+        print(Result)
+        print(" Result ------------------------------------------ ")
         return Result
-    if LIM_MOV == 0:
-        return []
-
+    if LIM_MOV == 0 or (len(objetivos) == 0):
+        return Result
     # TODO Verificar si ya estoy en uno de los objetivos:
-    if Matrix[row][col] == "d":
+    if Matrix[row][col] == "d" and ([row, col] in objetivos):
         toRemove = objetivos.index([row, col])
         objetivos.pop(toRemove)
+        # Actualizar matrix
+        Matrix[row][col] = "sP"
 
-    # Movimiento hacia arriba
-    if isMovValid(Matrix[row - 1][col]) and Result[-1] != "down":
-        # TODO calcular distancias
-        print("en up")
-        nextResult = copy.deepcopy(Result)
-        nextResult.append("up")
-        print(nextResult)
-        print("---------")
-        nextPosition = [row - 1, col]
-        nextDistances = euclidian_dist(nextPosition, objetivos)
-        Up = goTo(Matrix, nextPosition, objetivos,
-                  nextDistances, LIM_MOV - 1, nextResult)
-        return Up
+    nextMatrix = copy.deepcopy(Matrix)
 
     # Movimiento hacia abajo
-    if isMovValid(Matrix[row + 1][col]) and Result[-1] != "up":
+    if isMovValid(nextMatrix[row + 1][col]) and Result[-1] != "up":
         nextPosition = [row + 1, col]
+        nextResult = copy.deepcopy(Result)
+        nextResult.append("down")
         nextDistances = euclidian_dist(nextPosition, objetivos)
-        return [] + goTo(Matrix, nextPosition, objetivos,
-                         nextDistances, LIM_MOV - 1, Result.append("down"))
+        Down = goTo(nextMatrix, nextPosition, objetivos,
+                    nextDistances, LIM_MOV - 1, nextResult)
+
+    # Movimiento hacia arriba
+    if isMovValid(nextMatrix[row - 1][col]) and Result[-1] != "down":
+        # TODO calcular distancias
+        nextResult = copy.deepcopy(Result)
+        nextResult.append("up")
+
+        nextPosition = [row - 1, col]
+        nextDistances = euclidian_dist(nextPosition, objetivos)
+        Up = goTo(nextMatrix, nextPosition, objetivos,
+                  nextDistances, LIM_MOV - 1, nextResult)
+
     # Movimiento hacia derecha
-    if isMovValid(Matrix[row][col + 1]) and Result[-1] != "left":
+    if isMovValid(nextMatrix[row][col + 1]) and Result[-1] != "left":
         nextPosition = [row, col + 1]
         nextDistances = euclidian_dist(nextPosition, objetivos)
-        return goTo(Matrix, nextPosition, objetivos,
-                    nextDistances, LIM_MOV - 1, Result.append("right"))
+        nextResult = copy.deepcopy(Result)
+        nextResult.append("right")
+        Right = goTo(nextMatrix, nextPosition, objetivos,
+                     nextDistances, LIM_MOV - 1, nextResult)
 
     # Movimiento hacia derecha
-    if isMovValid(Matrix[row][col - 1]) and Result[-1] != "right":
+    if isMovValid(nextMatrix[row][col - 1]) and Result[-1] != "right":
         nextPosition = [row, col - 1]
         nextDistances = euclidian_dist(nextPosition, objetivos)
-        return goTo(Matrix, nextPosition, objetivos,
-                    nextDistances, LIM_MOV - 1, Result.append("left"))
-
-    return ["No hay caminos"]
+        nextResult = copy.deepcopy(Result)
+        nextResult.append("left")
+        Left = goTo(nextMatrix, nextPosition, objetivos,
+                    nextDistances, LIM_MOV - 1, nextResult)
+    print(Result)
+    return ["no Hay Caminos"]
 
 
 def isMovValid(Mov):
-    return Mov != "NF" and Mov != "W1" and Mov != "W2"
+    return Mov != "NF" and Mov != "w1" and Mov != "w2"
 
 
 [1, 2, 0.5, 2]
 # aux = get_elements(matrix, 'd')
 # print(aux)
-
-
-def menor(lista):
-    min = lista[0]
-    for x in lista:
-        if x < min:
-            min = x
-    return min
 
 
 diams = get_elements(matrix, 'd')
@@ -163,25 +162,26 @@ doorMs = get_elements(matrix, 'dM')
 stairs = get_elements(matrix, 'sT')
 
 print(diams)
+"""
 print(keys)
 print(rocks)
 print(holes)
 print(doorRs)
 print(doorMs)
 print(stairs[0])
-
+"""
 print(get_ch_pos(matrix))
 print(get_movements(matrix))
 
 dist = euclidian_dist(get_ch_pos(matrix), diams)
 print(dist)
 
-print(type(goTo(
+print(goTo(
     matrix,
     [get_ch_pos(matrix)[0], get_ch_pos(matrix)[1]],
     diams,
     dist, get_movements(matrix),
-    [""])))
+    [""]))
 # fn.press_and_release('right', pressed=5)
 # fn.press_and_release('down', pressed=3)
 # fn.press_and_release('left', pressed=5)
