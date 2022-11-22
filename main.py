@@ -14,10 +14,10 @@ image_name = 'image'
 path_image_start = 'image/image.png'
 path_image_end = 'image/blocks/end_states/1.png'
 
-#fn.open_nav(url_game)
-time.sleep(3)
-fn.get_img(image_board, image_save, image_name)
-time.sleep(2)
+# fn.open_nav(url_game)
+# time.sleep(3)
+# fn.get_img(image_board, image_save, image_name)
+# time.sleep(2)
 
 
 matrix = fn.get_mtx_gb(path_image_start)
@@ -36,7 +36,6 @@ def get_ch_pos(matrix):
     return x, y
 
 
-print('*************')
 
 
 def get_elements(matrix, element):
@@ -64,7 +63,8 @@ print('****')
 def euclidian_dist(pos_ch, elem_list):
     dist = []
     for i in elem_list:
-        dist.append(np.sqrt(np.sum(np.square(np.array(pos_ch) - np.array(i)))))
+        # dist.append(np.sqrt(np.sum(np.square(np.array(pos_ch) - np.array(i)))))
+        dist.append(euclidian(pos_ch, i))
     return dist
 
 
@@ -91,6 +91,13 @@ def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
         toRemove = objetivos.index([row, col])
         objetivos.pop(toRemove)
         distancias.pop(toRemove)
+        print('***********************')
+        print('Result', Result)
+        print('objetivos', objetivos)
+        print('distancias', distancias)
+        print('***********************')
+
+
 
         # Actualizar matrix
         Matrix[row][col] = "sP"
@@ -100,10 +107,12 @@ def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
     if (Matrix[row][col] != "sT" and len(objetivos) == 0):
         stairs = get_elements(matrix, 'sT')
         # Ir a la escalera
+        print('STAIRS',stairs)
         objetivos.append(stairs[0])
-        distancias.append(euclidian([row, col], stairs))
+        distancias.append(euclidian([row, col], [stairs[0][0], stairs[0][1]]))
     try:
         distance = min(distancias)
+        print(distancias)
         nearest_objetive = objetivos[distancias.index(min(distancias))]
     except:
         return "fail"
@@ -165,13 +174,24 @@ def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
 def isMovValid(Mov, next_position, nearest_objetive, distance):
 
     if (Mov not in ["NF", "w1", "w2"]) and (euclidian(next_position, nearest_objetive) <= distance):
+    # if (Mov not in ["NF", "w1", "w2"]) and ( <= distance):
         return True
     return False
 
+#TODO: en caso de enpate en cuanto a minimo obtener todos los indices y coord de esos elementos y luego en una funcion
+#que calcule los pasos y la devuelva y se retorna el de menos pasos y se escoge el indice de ese elemento el cual se
+#pasa como atributo de la funcion goto y se actualiza cada vez que se obtenga un nuevo minimo.
+
+#TODO: marcar como muro cuando pase por espina.
+
 
 def euclidian(origen, destino):
-    return np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))
-
+    # return np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))
+    # print(type(np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))))
+    # print((np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))))
+    c = abs(origen[0]- destino[0]) + abs(origen[1]- destino[1])
+    # print(float(c) + float(np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))))
+    return float(c) + float(np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino)))))
 
 [1, 2, 0.5, 2]
 # aux = get_elements(matrix, 'd')
@@ -209,12 +229,22 @@ Resultado = goTo(
     dist, get_movements(matrix),
     [""])
 print("EL resultado")
-print("Resultado")
+print(Resultado)
 Resultado.pop(0)
 time.sleep(2)
 
 for movement in Resultado:
     fn.press_and_release(movement, pressed=1)
+
+
+def walls():
+    aux = []
+    aux.append(get_elements(matrix, 'w1'))
+    aux.append(get_elements(matrix, 'w2'))
+    aux.append(get_elements(matrix, 'NF'))
+    aux.append(get_elements(matrix, 'm'))
+    return aux
+print(walls())
 
 # fn.press_and_release('right', pressed=5)
 # fn.press_and_release('down', pressed=3)
