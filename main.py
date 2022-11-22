@@ -14,10 +14,10 @@ image_name = 'image'
 path_image_start = 'image/image.png'
 path_image_end = 'image/blocks/end_states/1.png'
 
-# fn.open_nav(url_game)
-# time.sleep(3)
-# fn.get_img(image_board, image_save, image_name)
-# time.sleep(2)
+#fn.open_nav(url_game)
+time.sleep(3)
+fn.get_img(image_board, image_save, image_name)
+time.sleep(2)
 
 
 matrix = fn.get_mtx_gb(path_image_start)
