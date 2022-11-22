@@ -60,19 +60,34 @@ def get_movements(matrix):
 
 print('****')
 
+
 def euclidian_dist(pos_ch, elem_list):
     dist = []
     for i in elem_list:
         dist.append(np.sqrt(np.sum(np.square(np.array(pos_ch) - np.array(i)))))
     return dist
 
+
 def node_swap(node, pos_x, pos_y, operX, operY):
     node[pos_x][pos_y] = node[pos_x + operX][pos_y + operY]
     node[pos_x + operX][pos_y + operY] = 0
     return node
 
+def get_mat3x3(matrix):
+    mat3x3 = []
+    row, col = get_ch_pos(matrix)
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            print(i, j)
+            mat3x3.append(matrix[row + i][col + j])
+    return mat3x3
 
 
+print('---------')
+row, col = get_ch_pos(matrix)
+print(matrix[row - 1][col - 1], row - 1, col - 1)
+print(get_mat3x3(matrix))
+print('---------')
 
 # aux = get_elements(matrix, 'd')
 # print(aux)
