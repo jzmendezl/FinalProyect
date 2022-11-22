@@ -74,57 +74,67 @@ def node_swap(node, pos_x, pos_y, operX, operY):
     return node
 
 
-# Matrix, currentPosition, [objetivos], [distancias euclidianas], LIM_MOV
-# diccionario: posicion
-
-def getPath(Matrix, currentPosition, objetivos, distancias, LIM_MOV):
-    # 1. obtener objetivo más cercano.
-    nearest_objetive = objetivos.index(min(distancias))
-    # 2. Ir al objetivo
-
-
 def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
 
     row = copy.deepcopy(currentPosition[0])
     col = copy.deepcopy(currentPosition[1])
-    if Matrix[row][col] == "sT" and (len(objetivos) == 0):
-        print(Result)
-        print(" Result ------------------------------------------ ")
-        return Result
-    if LIM_MOV == 0 or (len(objetivos) == 0):
-        return Result
+    Up = None
+    Down = None
+    Left = None
+    Right = None
+
+    if Matrix[row][col] == "sT" and objetivos[0] == [row, col]:
+        return copy.deepcopy(Result)
+
     # TODO Verificar si ya estoy en uno de los objetivos:
-    if Matrix[row][col] == "d" and ([row, col] in objetivos):
+    if Matrix[row][col] in ["d"] and ([row, col] in objetivos):
         toRemove = objetivos.index([row, col])
         objetivos.pop(toRemove)
+        distancias.pop(toRemove)
+
         # Actualizar matrix
         Matrix[row][col] = "sP"
 
     nextMatrix = copy.deepcopy(Matrix)
 
+    if (Matrix[row][col] != "sT" and len(objetivos) == 0):
+        stairs = get_elements(matrix, 'sT')
+        # Ir a la escalera
+        objetivos.append(stairs[0])
+        distancias.append(euclidian([row, col], stairs))
+    try:
+        distance = min(distancias)
+        nearest_objetive = objetivos[distancias.index(min(distancias))]
+    except:
+        return "fail"
+
     # Movimiento hacia abajo
-    if isMovValid(nextMatrix[row + 1][col]) and Result[-1] != "up":
+    nextPosition = [row + 1, col]
+    if isMovValid(nextMatrix[row + 1][col], nextPosition, nearest_objetive, distance) and Result[-1] != "up":
         nextPosition = [row + 1, col]
         nextResult = copy.deepcopy(Result)
         nextResult.append("down")
+
         nextDistances = euclidian_dist(nextPosition, objetivos)
         Down = goTo(nextMatrix, nextPosition, objetivos,
                     nextDistances, LIM_MOV - 1, nextResult)
 
     # Movimiento hacia arriba
-    if isMovValid(nextMatrix[row - 1][col]) and Result[-1] != "down":
+    nextPosition = [row - 1, col]
+    if isMovValid(nextMatrix[row - 1, col], nextPosition, nearest_objetive, distance) and Result[-1] != "down":
+
         # TODO calcular distancias
+        nextPosition = [row - 1, col]
         nextResult = copy.deepcopy(Result)
         nextResult.append("up")
 
-        nextPosition = [row - 1, col]
         nextDistances = euclidian_dist(nextPosition, objetivos)
         Up = goTo(nextMatrix, nextPosition, objetivos,
                   nextDistances, LIM_MOV - 1, nextResult)
 
     # Movimiento hacia derecha
-    if isMovValid(nextMatrix[row][col + 1]) and Result[-1] != "left":
-        nextPosition = [row, col + 1]
+    nextPosition = [row, col + 1]
+    if isMovValid(nextMatrix[row][col + 1], nextPosition, nearest_objetive, distance) and Result[-1] != "left":
         nextDistances = euclidian_dist(nextPosition, objetivos)
         nextResult = copy.deepcopy(Result)
         nextResult.append("right")
@@ -132,19 +142,35 @@ def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
                      nextDistances, LIM_MOV - 1, nextResult)
 
     # Movimiento hacia derecha
-    if isMovValid(nextMatrix[row][col - 1]) and Result[-1] != "right":
-        nextPosition = [row, col - 1]
+    nextPosition = [row, col - 1]
+    if isMovValid(nextMatrix[row][col - 1], nextPosition, nearest_objetive, distance) and Result[-1] != "right":
         nextDistances = euclidian_dist(nextPosition, objetivos)
         nextResult = copy.deepcopy(Result)
         nextResult.append("left")
         Left = goTo(nextMatrix, nextPosition, objetivos,
                     nextDistances, LIM_MOV - 1, nextResult)
-    print(Result)
-    return ["no Hay Caminos"]
+
+    Resultados = []
+    if Up is not None:
+        return Up
+    elif Down is not None:
+        return Down
+    elif Left is not None:
+        return Left
+    elif Right is not None:
+        return Right
+    return ["No hay caminos"]
 
 
-def isMovValid(Mov):
-    return Mov != "NF" and Mov != "w1" and Mov != "w2"
+def isMovValid(Mov, next_position, nearest_objetive, distance):
+
+    if (Mov not in ["NF", "w1", "w2"]) and (euclidian(next_position, nearest_objetive) <= distance):
+        return True
+    return False
+
+
+def euclidian(origen, destino):
+    return np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))
 
 
 [1, 2, 0.5, 2]
@@ -176,12 +202,20 @@ print(get_movements(matrix))
 dist = euclidian_dist(get_ch_pos(matrix), diams)
 print(dist)
 
-print(goTo(
+Resultado = goTo(
     matrix,
     [get_ch_pos(matrix)[0], get_ch_pos(matrix)[1]],
     diams,
     dist, get_movements(matrix),
-    [""]))
+    [""])
+print("EL resultado")
+print("Resultado")
+Resultado.pop(0)
+time.sleep(2)
+
+for movement in Resultado:
+    fn.press_and_release(movement, pressed=1)
+
 # fn.press_and_release('right', pressed=5)
 # fn.press_and_release('down', pressed=3)
 # fn.press_and_release('left', pressed=5)
