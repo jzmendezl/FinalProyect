@@ -75,18 +75,19 @@ def get_mtx_gb(path_image):
   letterTiles = np.array(['b','ch','d','dM','dR','fI','fS','ha','ho','k','m','r','sP','sT','w1','w2'],dtype = object)
 
   #Compare
-  for i in range(0, len(tilesImage)):
-    for j in range(0, len(bankImages)):
-      errorL2 = cv2.norm(bankImages[j], tilesImage[i], cv2.NORM_L2 )
-      similarity = 1 - errorL2 / ( 64 * 64 )
-
-      #restriction
-      if(similarity>=0.7):
-        classificationImage[i] = letterTiles[j]
-
-    #restriction
-    if(classificationImage[i]==""):
-      classificationImage[i] = 'NF'
+  for i in range(len(tilesImage)):
+      for j in range(len(bankImages)):
+          errorL2 = cv2.norm(bankImages[j], tilesImage[i], cv2.NORM_L2)
+          similarity = 1 - errorL2 / (64 * 64)
+          if (similarity >= 0.7):
+              classificationImage[i] = letterTiles[j]
+              if classificationImage[i] == 'sP':
+                  if (similarity >= 0.85):
+                      classificationImage[i] = letterTiles[j]
+                  else:
+                      classificationImage[i] = 'fS'
+      if (classificationImage[i] == ""):
+          classificationImage[i] = 'NF'
 
   return classificationImage.reshape(15,10)
 
@@ -104,7 +105,7 @@ def send_click(pos, clicks=1):
     robot.click(clicks=clicks)
 
 
-def press_and_release(key, wait=0.03, pressed=1):
+def press_and_release(key, wait=0.02, pressed=1):
     for i in range(pressed):
         robot.keyDown(key)
         time.sleep(wait)

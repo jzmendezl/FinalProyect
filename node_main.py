@@ -71,7 +71,6 @@ def path_from_Origin(origin, n, parents):
     pathO = [n]
     i = n
     while True:
-
         i = parents[i]
         pathO.insert(0, i)
         if i == origin:
