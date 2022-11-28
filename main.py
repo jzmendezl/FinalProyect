@@ -3,6 +3,8 @@ import numpy as np
 import funtions as fn
 import heuristic_search
 import copy
+from more_itertools import locate
+
 url_game = "https://www.minijuegos.com/embed/diamond-rush"
 chrome_pos = 1475, 1050
 search_bar = 434, 70
@@ -34,8 +36,6 @@ def get_ch_pos(matrix):
     pos = np.where(matrix == 'ch')
     x, y = pos[0].tolist()[0], pos[1].tolist()[0]
     return x, y
-
-
 
 
 def get_elements(matrix, element):
@@ -96,8 +96,6 @@ def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
         print('objetivos', objetivos)
         print('distancias', distancias)
         print('***********************')
-
-
 
         # Actualizar matrix
         Matrix[row][col] = "sP"
@@ -184,13 +182,34 @@ def isMovValid(Mov, next_position, nearest_objetive, distance):
 
 #TODO: marcar como muro cuando pase por espina.
 
+def get_board(image):
+    return fn.get_mtx_gb(image)
+def path_is_vaild(path, elem):
+    if(np.where(path == elem)):
+        return False
+    return True
+def desempate(matrix, elem):
+    ls_elem = get_elements(matrix, elem)
+    pos_diam = euclidian_dist(get_ch_pos(matrix), ls_elem)
+    dup_elem = get_elem_dup(pos_diam)
+    dup_index = list(locate(pos_diam, lambda x: x in dup_elem))
+    coord_elem_dup = []
+
+    for elem in dup_index:
+        coord_elem_dup.append(ls_elem[elem])
+
+    print('\n\n\n*********************************')
+    print(ls_elem)
+    print(pos_diam)
+    print(dup_index)
+    print(coord_elem_dup)
+
+
+def get_elem_dup(ls):
+    return [x for i, x in enumerate(ls) if i != ls.index(x)]
 
 def euclidian(origen, destino):
-    # return np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))
-    # print(type(np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))))
-    # print((np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))))
-    c = abs(origen[0]- destino[0]) + abs(origen[1]- destino[1])
-    # print(float(c) + float(np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino))))))
+    c = abs(origen[0] - destino[0]) + abs(origen[1] - destino[1])
     return float(c) + float(np.sqrt(np.sum(np.square(np.array(origen) - np.array(destino)))))
 
 [1, 2, 0.5, 2]
@@ -245,6 +264,29 @@ def walls():
     aux.append(get_elements(matrix, 'm'))
     return aux
 print(walls())
+
+
+desempate(matrix, 'd')
+
+
+print('***********************************')
+m2 = get_board('image/Niveles/2.png')
+fn.print_mtx_gb(m2)
+
+print(get_ch_pos(matrix))
+def get_colum(matrix, column):
+    return matrix[:,column]
+
+def get_colum(matrix, column):
+    return matrix[:,column]
+
+def get_row(matrix, row):
+    return matrix[row,:]
+
+row, col = get_ch_pos(m2)
+print(col)
+colum = get_colum(m2, col)
+print(colum)
 
 # fn.press_and_release('right', pressed=5)
 # fn.press_and_release('down', pressed=3)
