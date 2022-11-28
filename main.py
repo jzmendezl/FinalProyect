@@ -59,7 +59,7 @@ def get_movements(matrix):
 
 
 print('****')
-
+print('mov', get_movements(matrix))
 
 def euclidian_dist(pos_ch, elem_list):
     dist = []
@@ -75,6 +75,7 @@ def node_swap(node, pos_x, pos_y, operX, operY):
     return node
 
 def goTo(Matrix, ch_pos, initial_target, targets, LM, Result):
+    print(ch_pos)
 # def goTo(Matrix, currentPosition, objetivos, distancias, LIM_MOV, Result):
     row = copy.deepcopy(ch_pos[0])
     col = copy.deepcopy(ch_pos[1])
@@ -82,6 +83,8 @@ def goTo(Matrix, ch_pos, initial_target, targets, LM, Result):
     Down = None
     Left = None
     Right = None
+    # initial_target.set_distance(euclidian(ch_pos, [initial_target.get_row(), initial_target.get_col()]))
+
 
     if Matrix[row][col] == "sT" \
             and targets[0].row == row \
@@ -94,6 +97,7 @@ def goTo(Matrix, ch_pos, initial_target, targets, LM, Result):
     if initial_target.get_row() == row and initial_target.get_col() == col:
         for target in targets:
             if target.get_row() == initial_target.get_row() and target.get_col() == initial_target.get_col():
+                print(target)
                 targets.remove(target)
         newResult = copy.deepcopy(Result)
         newResult.pop(0)
@@ -108,6 +112,8 @@ def goTo(Matrix, ch_pos, initial_target, targets, LM, Result):
             # Actualizar matrix
             Matrix[row][col] = "fS"
             break
+
+    # if len(get_elements(matrix, 'k')) > 0:
 
 
 
@@ -177,7 +183,9 @@ def goTo(Matrix, ch_pos, initial_target, targets, LM, Result):
 
 
 def isMovValid(Mov, next_position, nearest_objetive, distance):
-    if (Mov not in ["NF", "w1", "w2"]) and (euclidian(next_position, nearest_objetive) <= distance):
+    # print('eucl',euclidian(next_position, nearest_objetive))
+    # print('dist',distance)
+    if (Mov not in ["NF", "w1", "w2"]) and (euclidian(next_position, nearest_objetive) <= distance + 2):
         # if (Mov not in ["NF", "w1", "w2"]) and ( <= distance):
         return True
     return False
@@ -297,7 +305,7 @@ def get_row(matrix, row):
 
 
 def get_target(matrix, ch_pos):
-    elem_types = ['d', 'k', 'dR', 'dM', 'sT']
+    elem_types = ['d', 'k',  'dM', 'sT']
     target = []
     for elem_type in elem_types:
         target.extend(get_sub_target(
@@ -336,26 +344,27 @@ def solve(matrix, targets, acumlador, LM, ch_pos):
         newTargets = None
         newResult = None
 
-        print('it',initial_target)
+        print('it', initial_target)
         response = goTo(matrix, ch_pos, initial_target, targets, LM, Result)
-        print('reponse', response)
+        # print('reponse', response)
         if response is not None and len(response) == 4:
             newMatrix = response[0]
             # print(len(response))
             newCh_pos = response[1]
             newTargets = response[2]
             newResult = response[3]
-        # # print('response', response)
-        # # print('newMatrix', newMatrix)
-        # print('newCh_pos', newCh_pos)
-        # print('newTargets', newTargets)
-        # print('newRes', newResult)
-        # print('acm', acumlador)?
+        # print('response', response)
+        print('newMatrix', newMatrix)
+        print('newCh_pos', newCh_pos)
+        print('newTargets', newTargets)
+        print('newRes', newResult)
+        # print('acm', acumlador)
         if newTargets is not None and len(newTargets) == 0:
             return acumlador + newResult
         else:
             if newResult is not None:
-                return solve(newMatrix, newTargets, acumlador + newResult, LM - 1, newCh_pos)
+                print('resul', newResult)
+                return solve(newMatrix, newTargets, acumlador + newResult, LM, newCh_pos)
 
     return 'No path'
 
